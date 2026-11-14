@@ -1,0 +1,158 @@
+{
+  "entities": {
+    "VenueSettings": {
+      "title": "VenueSettings",
+      "description": "Publicly readable venue schedule and admin-configured pricing/facility notes for OS SPORTS TURF.",
+      "type": "object",
+      "properties": {
+        "openHour": {
+          "type": "integer",
+          "description": "Opening hour in 24h format (0-23)."
+        },
+        "closeHour": {
+          "type": "integer",
+          "description": "Closing hour in 24h format (1-24)."
+        },
+        "nightStartHour": {
+          "type": "integer",
+          "description": "Hour when outdoor floodlights and night rate apply (0-23)."
+        },
+        "dayRatePerHour": {
+          "type": "number",
+          "description": "Hourly rate in INR during daylight hours, or null if not published."
+        },
+        "nightRatePerHour": {
+          "type": "number",
+          "description": "Hourly rate in INR during floodlight hours, or null if not published."
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 8,
+          "description": "Currency code (INR)."
+        },
+        "customFacilities": {
+          "type": "array",
+          "description": "Admin-verified facility notes."
+        },
+        "announcement": {
+          "type": "string",
+          "maxLength": 240,
+          "description": "Optional venue notice."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["openHour", "closeHour", "nightStartHour", "currency", "updatedAt"]
+    },
+    "SlotLock": {
+      "title": "SlotLock",
+      "description": "Non-PII hourly slot lock record used for real-time availability and atomic double-booking prevention.",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "hour": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["booked", "blocked"]
+        },
+        "bookingId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["date", "hour", "status", "bookingId", "createdAt"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Customer turf reservation record containing PII, readable only by verified admin.",
+      "type": "object",
+      "properties": {
+        "bookingRef": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 32
+        },
+        "date": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "startHour": {
+          "type": "integer"
+        },
+        "durationHours": {
+          "type": "integer"
+        },
+        "customerName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80
+        },
+        "customerPhone": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 20
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "confirmed", "cancelled"]
+        },
+        "quotedTotal": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "bookingRef",
+        "date",
+        "startHour",
+        "durationHours",
+        "customerName",
+        "customerPhone",
+        "notes",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/settings/venue": {
+      "schema": { "$ref": "#/entities/VenueSettings" },
+      "description": "Single public venue configuration document managed by Admin."
+    },
+    "/slotLocks/{slotId}": {
+      "schema": { "$ref": "#/entities/SlotLock" },
+      "description": "Publicly readable non-PII slot lock documents (ID format YYYY-MM-DD_H) preventing double booking."
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "Private customer booking records readable and manageable strictly by Admin."
+    }
+  }
+}

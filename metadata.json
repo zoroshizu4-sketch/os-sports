@@ -1,0 +1,6 @@
+{
+  "name": "OS SPORTS TURF",
+  "description": "Open-air outdoor football turf in Mettupalayam, Tamil Nadu, India with floodlights, boundary nets, live slot booking, and 3D pitch experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
